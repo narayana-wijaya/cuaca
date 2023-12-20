@@ -185,13 +185,13 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               name,
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.w300),
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.w300),
             ),
             Text(
               value,
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.w700),
             )
           ],
         )
