@@ -1,7 +1,10 @@
 import 'dart:ui';
 
+import 'package:cuaca/bloc/weather_bloc_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -36,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 300,
                   width: 300,
                   decoration: const BoxDecoration(
-                      shape: BoxShape.circle, color: Colors.deepPurple),
+                      shape: BoxShape.circle, color: Colors.lightBlue),
                 ),
               ),
               Align(
@@ -45,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 300,
                   width: 300,
                   decoration: const BoxDecoration(
-                      shape: BoxShape.circle, color: Colors.deepPurple),
+                      shape: BoxShape.circle, color: Colors.lightBlue),
                 ),
               ),
               Align(
@@ -55,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 600,
                   decoration: const BoxDecoration(
                       // shape: BoxShape.circle,
-                      color: Colors.orangeAccent),
+                      color: Colors.blueAccent),
                 ),
               ),
               BackdropFilter(
@@ -64,104 +67,121 @@ class _HomeScreenState extends State<HomeScreen> {
                   decoration: const BoxDecoration(color: Colors.transparent),
                 ),
               ),
-              SizedBox(
-                width: size.width,
-                height: size.height,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(
-                          Icons.location_on,
-                          color: Colors.red,
-                          size: 16,
-                        ),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          'Denpasar',
-                          style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w300),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    const Text(
-                      'Good Morning',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(25.0),
-                      child: Center(
-                        child: Image.asset(
-                          'lib/assets/cloudy.png',
-                          width: size.width / 2,
-                        ),
+              BlocBuilder<WeatherBlocBloc, WeatherBlocState>(
+                builder: (context, state) {
+                  if (state is WeatherBlocSuccess) {
+                    return SizedBox(
+                      width: size.width,
+                      height: size.height,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Good ${_setDayPeriod(DateTime.now().hour)}!',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            DateFormat('EEEE, MMM dd')
+                                .format(state.weather.date!),
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w300),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(25.0),
+                            child: Center(
+                              child: Image.asset(
+                                _setWeatherIcon(
+                                    state.weather.weatherConditionCode!),
+                                width: size.width / 2,
+                              ),
+                            ),
+                          ),
+                          Center(
+                            child: Text(
+                              '${state.weather.temperature?.celsius?.round()}ºC',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 55,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          Center(
+                            child: Text(
+                              state.weather.weatherMain ?? '',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.location_on,
+                                color: Colors.red,
+                                size: 16,
+                              ),
+                              const SizedBox(
+                                width: 4,
+                              ),
+                              Text(
+                                state.weather.areaName ?? '',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w300),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _todayInfoWidget(
+                                  'lib/assets/sunny.png',
+                                  'Sunrise',
+                                  DateFormat(DateFormat.HOUR_MINUTE)
+                                      .format(state.weather.sunrise!)),
+                              _todayInfoWidget(
+                                  'lib/assets/sunset.png',
+                                  'Sunset',
+                                  DateFormat(DateFormat.HOUR_MINUTE)
+                                      .format(state.weather.sunset!))
+                            ],
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10.0),
+                            child: Divider(
+                              color: Colors.blueGrey,
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _todayInfoWidget('lib/assets/hot_temp.png', 'Max',
+                                  '${state.weather.tempMax?.celsius?.round()}ºC'),
+                              _todayInfoWidget(
+                                  'lib/assets/warm_temp.png',
+                                  'Min',
+                                  '${state.weather.tempMin?.celsius?.round()}ºC'),
+                              _todayInfoWidget('lib/assets/humidity.png',
+                                  "Humidity", '${state.weather.humidity} %')
+                            ],
+                          )
+                        ],
                       ),
-                    ),
-                    const Center(
-                      child: Text(
-                        '21ºC',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 55,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    const Center(
-                      child: Text(
-                        'SUNNY',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 25,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    const Center(
-                      child: Text(
-                        'Friday 20 - 21.00',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w300),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _todayInfoWidget(
-                            'lib/assets/sunny.png', 'Sunrise', '5:34 am'),
-                        _todayInfoWidget(
-                            'lib/assets/night.png', 'Sunset', '5:34 pm')
-                      ],
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10.0),
-                      child: Divider(
-                        color: Colors.blueGrey,
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _todayInfoWidget(
-                            'lib/assets/hot_temp.png', 'Temp Max', '32ºC'),
-                        _todayInfoWidget(
-                            'lib/assets/warm_temp.png', 'Temp Min', '25ºC')
-                      ],
-                    )
-                  ],
-                ),
+                    );
+                  } else {
+                    return Container();
+                  }
+                },
               )
             ],
           ),
@@ -175,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Image.asset(
           asset,
-          scale: 10,
+          scale: 12,
         ),
         const SizedBox(
           width: 5,
@@ -197,5 +217,42 @@ class _HomeScreenState extends State<HomeScreen> {
         )
       ],
     );
+  }
+
+  String _setWeatherIcon(int code) {
+    switch (code) {
+      case >= 200 && < 300:
+        return 'lib/assets/storm.png';
+      case >= 300 && < 400:
+        return 'lib/assets/drizzle.png';
+      case >= 500 && < 600:
+        return 'lib/assets/rainy.png';
+      case >= 600 && < 700:
+        return 'lib/assets/snowy.png';
+      case >= 700 && < 800:
+        return 'lib/assets/windy.png';
+      case > 800 && < 900:
+        return 'lib/assets/cloudy.png';
+      default:
+        return 'lib/assets/sunny.png';
+    }
+    /* 
+    Make weather image dynamic like:
+    - have sun vs moon by day,
+    - have cloud in front if cloudy
+    - set weather in from of the cloud */
+  }
+
+  String _setDayPeriod(int hour) {
+    switch (hour) {
+      case >= 4 && < 12:
+        return 'Morning';
+      case >= 12 && < 17:
+        return 'Afternoon';
+      case >= 17 && < 24:
+        return 'Evening';
+      default:
+        return 'Night';
+    }
   }
 }
