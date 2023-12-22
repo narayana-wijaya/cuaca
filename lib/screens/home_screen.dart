@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SystemUiOverlayStyle(statusBarBrightness: Brightness.dark),
       ),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(40, 1.2 * kToolbarHeight, 40, 20),
+        padding: const EdgeInsets.fromLTRB(40, kToolbarHeight, 40, 20),
         child: SizedBox(
           height: size.height,
           child: Stack(
@@ -56,9 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   height: 300,
                   width: 600,
-                  decoration: const BoxDecoration(
-                      // shape: BoxShape.circle,
-                      color: Colors.blueAccent),
+                  decoration: const BoxDecoration(color: Colors.blueAccent),
                 ),
               ),
               BackdropFilter(
@@ -75,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: size.height,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
                             'Good ${_setDayPeriod(DateTime.now().hour)}!',
@@ -91,13 +90,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w300),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(25.0),
-                            child: Center(
-                              child: Image.asset(
-                                _setWeatherIcon(
-                                    state.weather.weatherConditionCode!),
-                                width: size.width / 2,
+                          Expanded(
+                            flex: 4,
+                            child: Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Center(
+                                child: Image.asset(
+                                  _setWeatherIcon(
+                                      state.weather.weatherConditionCode!),
+                                  width: size.width * 2 / 3,
+                                ),
                               ),
                             ),
                           ),
@@ -139,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                           const SizedBox(
-                            height: 30,
+                            height: 20,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -174,7 +176,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               _todayInfoWidget('lib/assets/humidity.png',
                                   "Humidity", '${state.weather.humidity} %')
                             ],
-                          )
+                          ),
+                          Expanded(flex: 1, child: Container())
                         ],
                       ),
                     );
